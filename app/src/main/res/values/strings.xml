@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">My First App</string>
+    <string name="product_list">Product List</string>
+    <string name="product_detail">Product Detail</string>
+    <string name="profile">Profile</string>
+    <string name="user">User</string>
+    <string name="ok">OK</string>
+    <string name="back">Back</string>
+    <string name="full_address_string">%1$s, %2$s %3$s, %4$s</string>
+</resources>

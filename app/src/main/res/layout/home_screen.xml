@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context=".HomeScreen"
+  android:background="#eee">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/home_header_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="14dp"
+    android:background="#FF7777"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <com.google.android.material.imageview.ShapeableImageView
+      android:id="@+id/homeUserImage"
+      android:layout_width="120dp"
+      android:layout_height="120dp"
+      android:padding="5dp"
+      android:scaleType="centerCrop"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:shapeAppearanceOverlay="@style/roundedCorner"
+      app:strokeColor="#FFF"
+      app:strokeWidth="3dp"
+      tools:src="@tools:sample/avatars" />
+
+    <TextClock
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/kanit"
+      android:format12Hour="H:mm"
+      android:textSize="24sp"
+      android:textColor="@color/white"
+      app:layout_constraintStart_toEndOf="@id/homeUserImage"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      tools:text="Clock" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/home_header_container"
+    app:layout_constraintWidth_max="wrap"
+    app:layout_constraintWidth_percent="0.6">
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/profileButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/kanit"
+      android:text="@string/profile"
+      android:theme="@style/Theme.MyFirstApp"
+      app:shapeAppearanceOverlay="@style/roundedCorner" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/listButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:fontFamily="@font/kanit"
+      android:text="@string/product_list"
+      android:theme="@style/Theme.MyFirstApp"
+      app:shapeAppearanceOverlay="@style/roundedCorner" />
+
+  </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
