@@ -36,9 +36,8 @@
     android:name="com.example.myfirstapp.ProductDetailScreen"
     android:label="@string/product_detail"
     tools:layout="@layout/product_detail_screen">
-      <argument
-        android:name="userDetail"
-        android:defaultValue=""
-        app:argType="string" />
+    <argument
+      android:name="productDetail"
+      app:argType="com.example.myfirstapp.api.product.ProductListJsonItem"/>
   </fragment>
 </navigation>

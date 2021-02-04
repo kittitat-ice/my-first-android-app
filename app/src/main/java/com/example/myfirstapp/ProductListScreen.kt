@@ -2,108 +2,80 @@ package com.example.myfirstapp
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
+import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
+import com.example.myfirstapp.api.repository.Repository
+import com.example.myfirstapp.adapter.ProductListAdapter
 import com.example.myfirstapp.databinding.ProductListScreenBinding
-import org.json.JSONArray
-import java.text.NumberFormat
+import com.example.myfirstapp.viewModel.ProductListViewModel
+import com.example.myfirstapp.viewModelFactory.ProductListViewModelFactory
+import kotlinx.coroutines.*
 
 class ProductListScreen : Fragment() {
 
-    private lateinit var navController: NavController
-    private lateinit var activity: AppCompatActivity
-    private var _binding: ProductListScreenBinding? = null
-    private val binding get() = _binding!!
+  private lateinit var navController: NavController
+  private lateinit var activity: AppCompatActivity
+  private var _binding: ProductListScreenBinding? = null
+  private val binding get() = _binding!!
+  private val scope = MainScope()
+  private lateinit var viewModel: ProductListViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+  }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
 
-        _binding = ProductListScreenBinding.inflate(inflater, container, false)
-        activity = (requireActivity() as AppCompatActivity)
-        navController = Navigation.findNavController(activity, R.id.nav_host_fragment)
-        // set title
-        activity.supportActionBar?.title = navController.currentDestination?.label
+    _binding = ProductListScreenBinding.inflate(inflater, container, false)
+    activity = (requireActivity() as AppCompatActivity)
+    navController = Navigation.findNavController(activity, R.id.nav_host_fragment)
+    // set title
+    activity.supportActionBar?.title = navController.currentDestination?.label
 
-        val url = "https://jsonplaceholder.typicode.com/users"
+    val repository = Repository()
+    val viewModelFactory = ProductListViewModelFactory(repository)
+    viewModel = ViewModelProvider(this, viewModelFactory).get(ProductListViewModel::class.java)
 
-        val queue = Volley.newRequestQueue(binding.root.context)
+    binding.root.setOnRefreshListener { callAPI() }
 
-        val request = JsonArrayRequest(Request.Method.GET, url, null,
-            { response ->
-                binding.productList.adapter = ProductAdapter(response)
-                binding.productList.layoutManager = LinearLayoutManager(container?.context)
-            },
-            { error ->
-                Log.d("ERROR", error.toString())
-            }
-        )
+    binding.overlay.visibility = View.VISIBLE
+    callAPI()
 
-        queue.add(request)
+    return binding.root
+  }
 
-        return binding.root
-    }
+  private fun callAPI() {
+    viewModel.getProductList()
+    viewModel.response.observe(viewLifecycleOwner, { res ->
+      if(res.isSuccessful){
+        Log.d("RESPONSE", res.body().toString())
+        binding.productList.adapter = ProductListAdapter(res.body()!!)
+        binding.productList.layoutManager = LinearLayoutManager(binding.root.context)
+        binding.overlay.visibility = View.GONE
+        binding.root.isRefreshing = false
+      }else {
+        Toast.makeText(context, getText(R.string.list_error), Toast.LENGTH_LONG).show()
+        binding.root.isRefreshing = false
+      }
+    })
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+  }
 
-    private class ProductAdapter(private val dataSet: JSONArray) :
-        RecyclerView.Adapter<ProductAdapter.ViewHolder>() {
-
-        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val productName: TextView = view.findViewById(R.id.product_list_product_name)
-            val productPrice: TextView = view.findViewById(R.id.product_list_product_price)
-            val email: TextView = view.findViewById(R.id.product_list_email)
-            val website: TextView = view.findViewById(R.id.product_list_website)
-            val clickable: ViewGroup = view.findViewById(R.id.product_list_clickable)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.product_listitem, parent, false)
-
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
-            val item = dataSet.getJSONObject(position)
-
-            holder.productName.text = item.optString("name")
-            holder.email.text = item.optString("email")
-            holder.website.text = item.optString("website")
-            holder.productPrice.text = "฿${NumberFormat.getNumberInstance().format((1000..10000).random())}"
-
-            holder.clickable.setOnClickListener{ view ->
-                val action = ProductListScreenDirections.goToProductDetailScreen(item.toString())
-                view.findNavController().navigate(action)
-            }
-        }
-
-        override fun getItemCount() = dataSet.length()
-
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 }

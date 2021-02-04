@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
+import com.example.myfirstapp.api.product.Address
+import com.example.myfirstapp.api.product.Company
+import com.example.myfirstapp.api.product.ProductListJsonItem
 import com.example.myfirstapp.databinding.ProductDetailScreenBinding
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
@@ -29,7 +32,7 @@ class ProductDetailScreen : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = ProductDetailScreenBinding.inflate(inflater, container, false)
         activity = (requireActivity() as AppCompatActivity)
@@ -38,19 +41,20 @@ class ProductDetailScreen : Fragment() {
         activity.supportActionBar?.title = navController.currentDestination?.label
 
         Picasso.get().load("https://placeimg.com/480/360/people").into(binding.userDetailImage)
-        val userDetailJSON = JSONObject(args.userDetail)
-        val companyInfoJSON: JSONObject? = userDetailJSON.optJSONObject("company")
-        val addressInfoJSON: JSONObject? = userDetailJSON.optJSONObject("address")
-        binding.userDetailHeaderName.text = userDetailJSON.optString("name")
-        binding.userDetailEmail.text = userDetailJSON.optString("email")
-        binding.userDetailWebsite.text = userDetailJSON.optString("website")
-        binding.userDetailPhone.text = userDetailJSON.optString("phone")
+
+        val productDetail = args.productDetail
+        val companyInfo: Company = productDetail.company
+        val addressInfo: Address = productDetail.address
+        binding.userDetailHeaderName.text = productDetail.name
+        binding.userDetailEmail.text = productDetail.email
+        binding.userDetailWebsite.text = productDetail.website
+        binding.userDetailPhone.text = productDetail.phone
         binding.userDetailAddress.text = getString(
             R.string.full_address_string,
-            addressInfoJSON?.optString("street"),
-            addressInfoJSON?.optString("suite"),
-            addressInfoJSON?.optString("city"),
-            addressInfoJSON?.optString("zipcode")
+            addressInfo.street,
+            addressInfo.suite,
+            addressInfo.city,
+            addressInfo.zipcode
         )
 
         return binding.root
